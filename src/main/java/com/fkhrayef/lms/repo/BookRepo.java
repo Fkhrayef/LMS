@@ -15,4 +15,6 @@ public interface BookRepo extends JpaRepository<Book, Long> {
             "LOWER(b.title) LIKE LOWER(CONCAT( '%', :title, '%' )) OR " +
             "LOWER(a.name) LIKE LOWER(CONCAT( '%', :authorName, '%'))")
     List<Book> findByTitleOrAuthor(@Param("title") String title, @Param("authorName") String authorName);
+
+    boolean existsByTitle(String title);
 }

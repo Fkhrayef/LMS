@@ -2,6 +2,8 @@ package com.fkhrayef.lms.service;
 
 import com.fkhrayef.lms.dto.BookDto;
 import com.fkhrayef.lms.dto.BookResponse;
+import com.fkhrayef.lms.exceptions.BookNotFoundException;
+import com.fkhrayef.lms.exceptions.DuplicateBookException;
 import com.fkhrayef.lms.model.Author;
 import com.fkhrayef.lms.model.Book;
 import com.fkhrayef.lms.repo.AuthorRepo;
@@ -56,6 +58,12 @@ public class BookService {
     }
 
     public BookDto addBook(BookDto bookDto) {
+        // Check for duplicate book by title
+        boolean exists = repo.existsByTitle(bookDto.getTitle());
+        if (exists) {
+            throw new DuplicateBookException("Book with title '" + bookDto.getTitle() + "' already exists");
+        }
+
         Author author = authorRepo.findByName(bookDto.getAuthorName())
                 .orElse(null);
         Book book = new Book();
@@ -70,12 +78,8 @@ public class BookService {
     }
 
     public BookDto updateBook(BookDto bookDto) {
-        Optional<Book> optionalBook = repo.findById(bookDto.getId());
-        if (optionalBook.isEmpty()) {
-            return null; // Handle null later when you implement exception handling.
-        }
-
-        Book book = optionalBook.get();
+        Book book = repo.findById(bookDto.getId())
+                .orElseThrow(() -> new BookNotFoundException("Book with id '" + bookDto.getId() + "' does not exist"));
 
         // Update fields
         book.setTitle(bookDto.getTitle());
@@ -87,7 +91,8 @@ public class BookService {
 
         // Save and convert to DTO
         Book updatedBook = repo.save(book);
-        return new BookDto(updatedBook.getId(), updatedBook.getTitle(), updatedBook.getAuthor().getName());
+        String authorName = updatedBook.getAuthor() != null ? updatedBook.getAuthor().getName() : null; // potentially Author doesn't exist exception.
+        return new BookDto(updatedBook.getId(), updatedBook.getTitle(), authorName);
 
     }
 

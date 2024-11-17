@@ -2,7 +2,9 @@ package com.fkhrayef.lms.controller;
 
 import com.fkhrayef.lms.dto.BookDto;
 import com.fkhrayef.lms.dto.BookResponse;
+import com.fkhrayef.lms.exceptions.BookNotFoundException;
 import com.fkhrayef.lms.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,24 +32,19 @@ public class BookController {
     public ResponseEntity<BookDto> getBook(@PathVariable Long bookId) {
         return service.getBookById(bookId)
                 .map(book -> ResponseEntity.ok(book)) // If found, return 200 OK with the book
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .build()); // If not found, return 404 Not Found
+                .orElseThrow(() -> new BookNotFoundException("Book could not be found"));
     }
 
     @PostMapping("/books")
-    public ResponseEntity<BookDto> addBook(@RequestBody BookDto bookDto) {
+    public ResponseEntity<BookDto> addBook(@RequestBody @Valid BookDto bookDto) {
         BookDto book1 = service.addBook(bookDto);
         return new ResponseEntity<>(book1, HttpStatus.CREATED);
     }
 
     @PutMapping("/books")
-    public ResponseEntity<BookDto> updateBook(@RequestBody BookDto bookDto) {
+    public ResponseEntity<BookDto> updateBook(@RequestBody @Valid BookDto bookDto) {
         BookDto book1 = service.updateBook(bookDto);
-        if (book1 != null) {
-            return new ResponseEntity<>(book1, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(book1, HttpStatus.OK);
     }
 
     @DeleteMapping("/books/{bookId}")

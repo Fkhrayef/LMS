@@ -3,6 +3,7 @@ package com.fkhrayef.lms.controller;
 import com.fkhrayef.lms.dto.AuthorDto;
 import com.fkhrayef.lms.model.Author;
 import com.fkhrayef.lms.service.AuthorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class AuthorController {
     }
 
     @PostMapping("/authors")
-    public ResponseEntity<Author> addAuthor(@RequestBody Author author) {
+    public ResponseEntity<Author> addAuthor(@RequestBody @Valid Author author) {
         Author author1 = service.addAuthor(author);
         return new ResponseEntity<>(author1, HttpStatus.CREATED);
     }

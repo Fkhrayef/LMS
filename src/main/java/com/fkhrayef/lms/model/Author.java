@@ -1,6 +1,8 @@
 package com.fkhrayef.lms.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +31,8 @@ public class Author {
     private Long id;
 
     @Column(name = "name", nullable = false, columnDefinition = "TEXT")
+    @NotBlank(message = "Author name is mandatory")
+    @Size(min = 2, max = 100, message = "Author name should be between 2 and 100 characters")
     private String name;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
