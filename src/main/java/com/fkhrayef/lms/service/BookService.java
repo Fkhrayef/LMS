@@ -1,66 +1,103 @@
 package com.fkhrayef.lms.service;
 
+import com.fkhrayef.lms.dto.BookDto;
+import com.fkhrayef.lms.dto.BookResponse;
+import com.fkhrayef.lms.model.Author;
 import com.fkhrayef.lms.model.Book;
+import com.fkhrayef.lms.repo.AuthorRepo;
+import com.fkhrayef.lms.repo.BookRepo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
 
-    List<Book> books = new ArrayList<>( Arrays.asList(
-            new Book(101, "Calculus", "Mathew"),
-            new Book(102, "Arabic", "Abdulaziz")
-    ));
+    private final BookRepo repo;
+    private final AuthorRepo authorRepo;
 
-    public List<Book> getAllBooks() {
-        return books;
+    public BookService(BookRepo repo, AuthorRepo authorRepo) {
+        this.repo = repo;
+        this.authorRepo = authorRepo;
     }
 
-    public Optional<Book> getBookById(int bookId) {
-        return books.stream()
-                .filter(p -> p.getId() == bookId)
-                .findFirst();
+    public BookResponse getAllBooks(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Book> books = repo.findAll(pageable);
+        List<Book> bookList = books.getContent();
+        List<BookDto> content = bookList.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+
+        BookResponse bookResponse = new BookResponse();
+        bookResponse.setContent(content);
+        bookResponse.setPageNo(books.getNumber());
+        bookResponse.setPageSize(books.getSize());
+        bookResponse.setTotalElements(books.getTotalElements());
+        bookResponse.setTotalPages(books.getTotalPages());
+        bookResponse.setLast(books.isLast());
+        return bookResponse;
+    }
+    // Helper method for pagination in getAllBooks() endpoint.
+    private BookDto mapToDto(Book book) {
+        return new BookDto(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor() != null ? book.getAuthor().getName() : null
+        );
     }
 
-    public Book addBook(Book book) {
-        books.add(book);
-        return book;
+    public Optional<BookDto> getBookById(Long bookId) {
+        return repo.findById(bookId)
+                .map(this::mapToDto);
     }
 
-    public boolean updateBook(Book book) {
-        int index = -1; // Start with an invalid index
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getId() == book.getId()) {
-                index = i; // Store the index where the book is found
-                break; // Exit loop as soon as the book is found
-            }
-        }
-        if (index != -1) {
-            books.set(index, book); // Update if the book was found
-            return true;
-        } else {
-            return false;
-        }
+    public BookDto addBook(BookDto bookDto) {
+        Author author = authorRepo.findByName(bookDto.getAuthorName())
+                .orElse(null);
+        Book book = new Book();
+        book.setTitle(bookDto.getTitle());
+        book.setAuthor(author);
+
+        Book savedBook = repo.save(book);
+
+        String authorName = savedBook.getAuthor() != null ? savedBook.getAuthor().getName() : null;
+
+        return new BookDto(savedBook.getId(), savedBook.getTitle(), authorName);
     }
 
-    public boolean deleteBook(int bookId) {
-        int index = -1; // Start with an invalid index
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getId() == bookId) {
-                index = i; // Store the index where the book is found
-                break; // Exit loop as soon as the book is found
-            }
+    public BookDto updateBook(BookDto bookDto) {
+        Optional<Book> optionalBook = repo.findById(bookDto.getId());
+        if (optionalBook.isEmpty()) {
+            return null; // Handle null later when you implement exception handling.
         }
 
-        if (index != -1) {
-            books.remove(index); // Delete if the book was found
-            return true;
-        } else {
-            return false;
+        Book book = optionalBook.get();
+
+        // Update fields
+        book.setTitle(bookDto.getTitle());
+
+        if (bookDto.getAuthorName() != null) {
+            Author author = authorRepo.findByName(bookDto.getAuthorName()).orElse(null);
+            book.setAuthor(author); // Keep it null-safe for now.
         }
+
+        // Save and convert to DTO
+        Book updatedBook = repo.save(book);
+        return new BookDto(updatedBook.getId(), updatedBook.getTitle(), updatedBook.getAuthor().getName());
+
+    }
+
+    public void deleteBook(Long bookId) {
+        repo.deleteById(bookId);
+    }
+
+    public List<BookDto> findBooksByTitleOrAuthor(String title, String authorName) {
+        return repo.findByTitleOrAuthor(title, authorName).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 }

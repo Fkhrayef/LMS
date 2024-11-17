@@ -1,6 +1,7 @@
 package com.fkhrayef.lms.controller;
 
-import com.fkhrayef.lms.model.Book;
+import com.fkhrayef.lms.dto.BookDto;
+import com.fkhrayef.lms.dto.BookResponse;
 import com.fkhrayef.lms.service.BookService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,15 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public ResponseEntity<List<Book>> getBooks() {
-        return new ResponseEntity<>(service.getAllBooks(), HttpStatus.OK);
+    public ResponseEntity<BookResponse> getBooks(
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
+    ) {
+        return new ResponseEntity<>(service.getAllBooks(pageNo, pageSize), HttpStatus.OK);
     }
 
     @GetMapping("/books/{bookId}")
-    public ResponseEntity<Book> getBook(@PathVariable int bookId) {
+    public ResponseEntity<BookDto> getBook(@PathVariable Long bookId) {
         return service.getBookById(bookId)
                 .map(book -> ResponseEntity.ok(book)) // If found, return 200 OK with the book
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -31,28 +35,36 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public ResponseEntity<?> addBook(@RequestBody Book book) {
-        Book book1 = service.addBook(book);
+    public ResponseEntity<BookDto> addBook(@RequestBody BookDto bookDto) {
+        BookDto book1 = service.addBook(bookDto);
         return new ResponseEntity<>(book1, HttpStatus.CREATED);
     }
 
     @PutMapping("/books")
-    public ResponseEntity<String> updateBook(@RequestBody Book book) {
-        boolean updated = service.updateBook(book);
-        if (updated) {
-            return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<BookDto> updateBook(@RequestBody BookDto bookDto) {
+        BookDto book1 = service.updateBook(bookDto);
+        if (book1 != null) {
+            return new ResponseEntity<>(book1, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/books/{bookId}")
-    public ResponseEntity<String> deleteBook(@PathVariable int bookId) {
-        boolean deleted = service.deleteBook(bookId);
-        if (deleted) {
+    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
+        if (service.getBookById(bookId).isPresent()) {
+            service.deleteBook(bookId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/books/search")
+    public ResponseEntity<List<BookDto>> searchBooks(@RequestParam(required = false) String title,
+                                                  @RequestParam(required = false) String authorName) {
+        System.out.println("searching for:" + title + " " + authorName);
+        List<BookDto> books = service.findBooksByTitleOrAuthor(title, authorName);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 }
