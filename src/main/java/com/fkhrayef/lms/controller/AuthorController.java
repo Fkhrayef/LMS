@@ -31,7 +31,6 @@ public class AuthorController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .build()); // If not found, return 404 Not Found
     }
-
     @PostMapping("/authors")
     public ResponseEntity<Author> addAuthor(@RequestBody @Valid Author author) {
         Author author1 = service.addAuthor(author);

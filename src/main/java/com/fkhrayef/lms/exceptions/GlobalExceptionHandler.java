@@ -2,6 +2,7 @@ package com.fkhrayef.lms.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -26,6 +27,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorObject> handleDuplicateBookException(DuplicateBookException ex) {
         ErrorObject errorObject = buildErrorObject(HttpStatus.CONFLICT, ex.getMessage());
         return new ResponseEntity<>(errorObject, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
+        return new ResponseEntity<>("Access is denied", HttpStatus.FORBIDDEN); // 403
     }
 
     // Utility method to build error object ( avoiding DRY(Don't Repeat Yourself) )
