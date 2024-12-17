@@ -8,6 +8,10 @@ import com.fkhrayef.lms.model.Author;
 import com.fkhrayef.lms.model.Book;
 import com.fkhrayef.lms.repo.AuthorRepo;
 import com.fkhrayef.lms.repo.BookRepo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +56,9 @@ public class BookService {
         );
     }
 
+    @Cacheable(cacheNames = "books", key = "#bookId")
     public Optional<BookDto> getBookById(Long bookId) {
+        System.out.println("Cache miss for book with ID: " + bookId);
         return repo.findById(bookId)
                 .map(this::mapToDto);
     }
@@ -77,6 +83,14 @@ public class BookService {
         return new BookDto(savedBook.getId(), savedBook.getTitle(), authorName);
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "books", key = "#bookDto.id"),
+            },
+            put = {
+                    @CachePut(cacheNames = "books", key = "#bookDto.id")
+            }
+    )
     public BookDto updateBook(BookDto bookDto) {
         Book book = repo.findById(bookDto.getId())
                 .orElseThrow(() -> new BookNotFoundException("Book with id '" + bookDto.getId() + "' does not exist"));
@@ -96,6 +110,9 @@ public class BookService {
 
     }
 
+
+
+    @CacheEvict(cacheNames = "books", key = "#bookId")
     public void deleteBook(Long bookId) {
         repo.deleteById(bookId);
     }
