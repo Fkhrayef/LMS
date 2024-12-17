@@ -126,3 +126,49 @@ Note: I also learnt Basic Authentication and In Memory Authentication Provider p
 ### **Resources:**
 - [Spring Security 6 with ReactJS, OAuth2, JWT | Spring Boot](https://www.udemy.com/course/spring-security-6-with-reactjs-oauth2-jwt-multifactor-authentication/) by Faisal Memon. You can find part of the course for free [here](https://youtu.be/Kzx8MKA7Q0Y?si=OOfZHqsOv4ei6Uho)
   
+---
+
+## **Week 5: Caching**
+
+### **Description:**  
+In this week, the focus was on implementing **caching** using **Redis** to improve the performance of the application. The goal was to store frequently accessed data in the Redis cache, reducing database load and enhancing response times.  
+
+### **Key Implementations:**  
+
+- **Dependencies Added:**  
+  - `spring-boot-starter-cache` for caching support.  
+  - `spring-boot-starter-data-redis` for integrating Redis with the application.  
+
+- **Redis Configuration:**  
+  - Configured Redis connection in `application.properties`:  
+    ```properties
+    spring.data.redis.host=localhost  
+    spring.data.redis.port=6379  
+    spring.cache.type=redis  
+    ```  
+  - Enabled caching in the main application using `@EnableCaching`.  
+
+- **Caching in Service Layer:**  
+  - Added caching annotations to optimize the `BookService` operations:  
+    - `@Cacheable`: Caches book data for **read operations** (`getBookById`).  
+    - `@CachePut` and `@CacheEvict`: Updates and clears the cache during **update** and **delete operations** respectively.  
+  - Made `BookDto` implement `Serializable` to ensure objects can be cached.  
+
+- **Testing:**  
+  - Manually tested the caching behavior using **Postman** to ensure the following:  
+    - Cache entries are created on **GET** requests.  
+    - Cache is updated on **PUT** operations.  
+    - Cache is cleared on **DELETE** operations.  
+
+### **Key Learnings:**  
+- Understood how to enable and configure caching in a Spring Boot application.  
+- Learned to integrate Redis as a caching solution.  
+- Gained hands-on experience with Spring Cache annotations: `@Cacheable`, `@CachePut`, and `@CacheEvict`.  
+- Realized the importance of cache consistency when handling update and delete operations.  
+- Learned how to make DTOs cache-friendly by implementing `Serializable`.  
+
+### **Resources:**  
+- [Caching Service Layers in a Spring Boot Application Using Redis](https://medium.com/@toearkar.15/caching-service-layers-in-a-spring-boot-application-using-redis-925526edd03e)  
+- [Spring Data Redis | How to Use Redis Cache in Your Spring Boot Project](https://youtu.be/IEJJ1tcAZTo?si=5QBzntdsLi6JyB1E)  
+
+---  
