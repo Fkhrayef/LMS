@@ -2,11 +2,15 @@ package com.fkhrayef.lms.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
 public class AuthorDto {
     private Long id;
 //    These validation annotations are just for "looks" it doesn't work

@@ -20,7 +20,7 @@ public class AuthorController {
     }
 
     @GetMapping("/authors")
-    public ResponseEntity<List<AuthorDto>> getBooks() {
+    public ResponseEntity<List<AuthorDto>> getAuthors() {
         return new ResponseEntity<>(service.getAllAuthors(), HttpStatus.OK);
     }
 
