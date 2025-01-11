@@ -11,6 +11,9 @@ Before starting this project, I took the following courses to build a strong fou
 2. [Spring 6 and Spring Boot Tutorial for Beginners by Telusko](https://youtube.com/playlist?list=PLsyeobzWxl7qbKoSgR5ub6jolI8-ocxCF&si=DswzPGXQiNmfLn24)  
    This tutorial series gave me additional insights into building robust applications with Spring Framework and Spring Boot.
 
+3. [Spring Boot 3, Spring Framework 6: Beginner to Guru](https://www.udemy.com/course/spring-framework-6-beginner-to-guru/?srsltid=AfmBOorNilkdmOgKe68iAEJfahnoNIkV3nJm_SbyBEQh4LHwmPkbYCmy&couponCode=LETSLEARNNOW)  
+   This one was my first, but I didn't actually finish it just because I liked the prevoius resources better.
+
 ---
 
 ## **Week 1: Spring Boot Essentials & Basic API Development**
@@ -172,3 +175,51 @@ In this week, the focus was on implementing **caching** using **Redis** to impro
 - [Spring Data Redis | How to Use Redis Cache in Your Spring Boot Project](https://youtu.be/IEJJ1tcAZTo?si=5QBzntdsLi6JyB1E)  
 
 ---  
+
+## **Week 6: Testing**
+
+### **Description:**  
+The focus of Week 6 was on implementing both unit and integration tests for the Spring Boot application using JUnit 5, Mockito, and Spring Test framework to ensure code reliability and correctness.
+
+### **Key Implementations:**  
+- **Implemented unit tests for all layers:**
+  - Controllers: Testing request/response handling
+  - Services: Testing business logic
+  - Repositories: Testing data access (for learning purposes)
+- **Created integration tests to verify:**
+  - Complete API flows
+  - Security and authentication
+  - Database operations using H2
+- **Set up test configurations:**
+  - Separate `application-test.properties`
+  - Test data management with `@BeforeEach`
+  - MockMvc for testing REST endpoints
+
+### **Key Learnings:**  
+- Writing effective unit tests using JUnit 5 and Mockito
+- Setting up integration tests with Spring Boot Test
+- Managing test data and configurations
+- Using MockMvc for controller testing
+- Understanding testing best practices across different layers
+
+### **Resources:**  
+- [Spring Boot Unit Testing Tutorial (W/ Mockito)](https://youtube.com/playlist?list=PL82C6-O4XrHcg8sNwpoDDhcxUCbFy855E) by Teddy Smith.
+
+---  
+
+## **Week 7: Logging and Monitoring**
+
+### TODO
+
+---
+
+## **Week 8: Background Jobs and Scheduling**
+
+### TODO
+
+---
+
+## **Week 9: Deployment and Production-Readiness** 
+
+### TODO
+
